@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>RemoteCMD</title>
+	<link rel="stylesheet" href="./css/console.css">
+	<link rel="stylesheet" href="./css/appList.css">
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.1.0/markdown-it.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/3.0.18/autosize.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body id="particles-js">
+	<div class='console'>
+		<div class='console-inner'>
+			<div id="outputs">
+			</div>
+			<div class='output-cmd'><textarea autofocus class='console-input' placeholder="Type command..."></textarea>
+			</div>
+		</div>
+	</div>
+	<div class='appList'>
+			<div class='appList-inner'>
+				<!-- <div class="appList-entry">AppName#1234</div>
+				<div class="appList-entry">AppName#1235</div> -->
+			</div>
+	</div>
+</body>
+<script src="./js/console.js"></script>
+<script src="./js/console.functions.js"></script>
+<script src="./js/appList.js"></script>
+<script src="./js/websocket.js"></script>
+</html>
