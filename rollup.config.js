@@ -2,7 +2,6 @@ import path from 'path';
 import typescript from 'rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import builtins from 'rollup-plugin-node-builtins';
 import autoExternal from 'rollup-plugin-auto-external';
 import json from 'rollup-plugin-json'
 import globals from 'rollup-plugin-node-globals';
@@ -18,13 +17,11 @@ export default {
     plugins: [
         typescript(),
         autoExternal({
-            builtins: true, //true
             dependencies: true, // false
             packagePath: path.resolve('./package.json'),
             peerDependencies: false
         }),
         globals(),
-        builtins(),
         resolve({
             jsnext: true,
             main: true
