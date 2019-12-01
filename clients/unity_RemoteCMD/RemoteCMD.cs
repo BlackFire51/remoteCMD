@@ -11,6 +11,15 @@ public class RemoteCMD : MonoBehaviour
     public string appKey = "";
     private static localFunctions FUNCTIONS = new localFunctions();
 
+    //Awake is called when the script instance is being loaded.
+    void Awake()
+    {
+        if (Application.platform != RuntimePlatform.WindowsEditor && client == null)
+        {
+            client = new TcpClient(host, port, appKey, FUNCTIONS);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +27,10 @@ public class RemoteCMD : MonoBehaviour
         //  {
         //      Debug.Log("Exec test 1 ");
         //  });
-        client = new TcpClient(host, port,appKey, FUNCTIONS);
+        if (Application.platform == RuntimePlatform.WindowsEditor && client == null)
+        {
+            client = new TcpClient(host, port, appKey, FUNCTIONS);
+        }
     }
 
     // Update is called once per frame
@@ -51,7 +63,8 @@ public class RemoteCMD : MonoBehaviour
     }
     void OnApplicationQuit()
     {
-        client.Destroy(); 
+        client.Destroy();
+        client = null;
     }
 
     /// <summary>
