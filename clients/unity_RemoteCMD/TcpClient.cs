@@ -15,6 +15,7 @@ namespace RemoteConsole
         public bool canSend { get; private set; } = false;
         private byte[] revBuffer = null;
         private Queue<string> stack = new Queue<string>();
+        private Queue<Messages.BaseMsg> stackDynamic = new Queue<Messages.BaseMsg>();
         private string appKey;
         private Timer timer;
         private localFunctions functions;
@@ -44,7 +45,7 @@ namespace RemoteConsole
                 //########################
                 // Hook msg log
                 this.canSend = true;
-                this.Send(JsonUtility.ToJson(new AuthReqMessage(this.appKey)));
+                this.Send(JsonUtility.ToJson(new Messages.AuthReq(this.appKey)));
                 Receive();
                 timer = new Timer();
                 timer.Interval = 1000;
@@ -107,24 +108,28 @@ namespace RemoteConsole
                     Receive();
                     if (sb.Length > 1){
                         string msg = sb.ToString();
-                        int idx=msg.IndexOf(':');
-                        if (idx < 0 || msg.Length<idx+1) // no system msg add to basic queue
+                        try
                         {
-                            stack.Enqueue(msg);
-                            return;
-                        }
-                        string prefix = msg.Substring(0, idx);
-                        string msg2 = msg.Substring(idx + 1);
-                        switch (prefix) // check if we have a special purpos for msg this this prefix
-                        {
-                            case "auth":
-                                this.Send(this.functions.getListFroNetwork());
-                                break;
-                            default: // no special porpos add to basic queue
-                                stack.Enqueue(msg);
-                                break;
+                            //dynamic msgJson = RemoteConsole.DynamicJson.Parse(msg);
+                            Messages.BaseMsg msgJson = Messages.MessageHandler.getMessage(msg);
+                            Debug.Log(msgJson);
+                            switch (msgJson.Type) // check if we have a special purpos for msg this this prefix
+                            {
+                                case "AuthAsw":
+                                    this.Send(this.functions.getListFroNetwork());
+                                    break;
+                                default: // no special porpos add to basic queue
+                                    stackDynamic.Enqueue(msgJson);
+                                    break;
 
+                            }
                         }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("can not parse Json" + e);
+                        }
+
+
 
                     }
                 }
@@ -153,17 +158,21 @@ namespace RemoteConsole
         {
             return stack.Count > 1;
         }
-
-        private class AuthReqMessage
+        public Messages.BaseMsg getMessageDynamic()
         {
-            public string Type = "authReq";
-            public string appKey;
-            public AuthReqMessage(string appKey)
-            {
-                this.appKey = appKey;
-            }
-
+            if (stackDynamic.Count < 1) return null;
+            return stackDynamic.Dequeue();
         }
+        public bool dataAvalableDynamic()
+        {
+            return stackDynamic.Count > 1;
+        }
+        public int getQLen()
+        {
+            return stackDynamic.Count;
+        }
+
+
     }
 
 

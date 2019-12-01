@@ -42,6 +42,15 @@ namespace RemoteConsole
             }
             functions[msg].Callback(args); // exec cmd
         }
+     
+        public void HandleNetworkMessageJson(Messages.BaseMsg msg)
+        {
+            if (msg.Type != "Cmd") return; // this is not a command msg 
+            Messages.Cmd cmd = (Messages.Cmd)msg;
+            if (!functions.ContainsKey(cmd.cmd)) return; // we dont have a comand with this name 
+            functions[cmd.cmd].Callback(cmd.args); // exec cmd
+        }
+
         public string getListFroNetwork()
         {
             localFunctionInfo[] infoArr = new localFunctionInfo[this.functions.Count];
@@ -54,6 +63,7 @@ namespace RemoteConsole
             return str;
         }
     }
+
     /// <summary>
     /// Class to Hold data of a function
     /// </summary>

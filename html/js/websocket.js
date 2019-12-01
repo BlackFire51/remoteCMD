@@ -25,9 +25,9 @@ function connect(){
 					output("New Server Instance of app Started joining instance #"+msgObj.appInstanceId)
 					activeAppInstanceId=msgObj.appInstanceId
 					break;
-				case "cmdFunctionList":
+				case "subscripedTo":
 					resetCmds()
-					msgObj.data.forEach(func => {
+					msgObj.functionData.forEach(func => {
 						cmds[func.Name]=function(...args){
 							console.log("exec",func.Name,args)
 							ws.send(JSON.stringify({
@@ -41,7 +41,25 @@ function connect(){
 						cmds[func.Name].usage=func.Usage
 						cmds[func.Name].doc=func.Help
 					});
+					output("Subscriped to "+msgObj.appName+"#"+msgObj.appInstanceId)
 					break
+					case "updateFunctions":
+						resetCmds()
+						msgObj.functionData.forEach(func => {
+							cmds[func.Name]=function(...args){
+								console.log("exec",func.Name,args)
+								ws.send(JSON.stringify({
+									Type:"cmdExec",
+									appName:activeAppName,
+									appInstanceId:activeAppInstanceId,
+									cmd:func.Name,
+									args:args
+								}))
+							}
+							cmds[func.Name].usage=func.Usage
+							cmds[func.Name].doc=func.Help
+						});
+						break
 				default:
 					break;
 			}

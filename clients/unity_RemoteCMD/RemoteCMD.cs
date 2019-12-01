@@ -24,10 +24,20 @@ public class RemoteCMD : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!client.dataAvalable()) return; // check if we have data avalable 
+        if(client==null) return;
         string str = client.getMessage(); // Message resived from Network 
-        if (str == null) return; // invalide msg skipping
-        HandleNetworkMessage(str);
+        if (str != null) // check if we have a valide msg
+        {
+            HandleNetworkMessage(str);
+        }
+
+        RemoteConsole.Messages.BaseMsg msg = client.getMessageDynamic(); // Message resived from Network 
+        if (msg != null) // check if we have a valide msg
+        {
+            //HandleNetworkMessageJson(jsonMsg);
+            FUNCTIONS.HandleNetworkMessageJson(msg);
+        }
+                             
     }
     void OnEnable()
     {
@@ -52,8 +62,8 @@ public class RemoteCMD : MonoBehaviour
     /// <param name="type">type of log Entry (info,debug,error,...)</param>
     void HandleLog(string logString, string stackTrace, LogType type)
     {
-        string msg = JsonUtility.ToJson(new logMessage(logString, Enum.GetName(typeof(LogType), type)));
-        client.Send(msg);
+        string msg = JsonUtility.ToJson(new RemoteConsole.Messages.Log(logString, Enum.GetName(typeof(LogType), type)));
+        if(client!=null) client.Send(msg);
     }
     /// <summary>
     /// Internal function to handle Msg from the Network 
@@ -74,19 +84,6 @@ public class RemoteCMD : MonoBehaviour
     public static void registerComand(string name, string usage, string help, delegateCallback callback)
     {
         FUNCTIONS.registerComand(name, usage, help, callback);
-    }
-
-    private class logMessage
-    {
-        public string Type = "Log";
-        public string LogMsg;
-        public string LogType;
-        public logMessage(string msg,string logType)
-        {
-            LogMsg = msg;
-            LogType = logType;
-        }
-
     }
 
 }

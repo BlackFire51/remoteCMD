@@ -28,7 +28,7 @@ class RemoteServerManager{
 			if(msg=="keepAlive") return;
 			try {
 				let obj = JSON.parse(msg);
-				if(obj.Type=="authReq"){
+				if(obj.Type=="AuthReq"){
 					console.log("new app key:",obj.appKey)
 					socket.removeAllListeners('data')
 					this.addNewServer(socket,obj.appKey)
@@ -91,13 +91,16 @@ class RemoteServerManager{
 			}))
 		})
 		if(clean){
-			this.waitingForNewInstance=this.waitingForNewInstance.filter(cln=>cln.appName==srv.appName)
+			this.waitingForNewInstance=this.waitingForNewInstance.filter(cln=>cln.appName!=srv.appName)
 		}
 		let list= this.getServerInstanceList()
 		this.appListUpdateCallbacks.forEach(callback=>{
 			callback(list)
 		})
-		socket.write("auth:"+srv.appInstanceId);
+		socket.write(JSON.stringify({
+			Type:"AuthAsw",
+			appInstanceId:+srv.appInstanceId
+		}));
 		return srv;
 	}
 	removeServer(socket:net.Socket){

@@ -35,12 +35,12 @@ export default class RemoteServer{
 	public subscribeWebClient(ws:WebSocket){
 		this.subscribedWebClients.push(ws)
 		let functionStr= JSON.stringify({
-			Type:"cmdFunctionList",
-			data:this.functionData
+			Type:"subscripedTo",
+			appName:this.appName,
+			appInstanceId:this.appInstanceId,
+			functionData:this.functionData
 		})
-		this.subscribedWebClients.forEach(ws=>{
-			ws.send(functionStr)
-		})
+		ws.send(functionStr)
 	}
 	public Close(){
 		this.subscribedWebClients.forEach(ws=>{
@@ -55,6 +55,16 @@ export default class RemoteServer{
 		switch (obj.Type) {
 			case "cmdFunctionList":
 				this.functionData=obj.Items
+				let functionStr= JSON.stringify({
+					Type:"updateFunctions",
+					appName:this.appName,
+					appInstanceId:this.appInstanceId,
+					functionData:this.functionData
+				})
+				this.subscribedWebClients.forEach(c=>{
+					c.send(functionStr)
+				})
+				
 				return true;
 			default:
 				return false;
@@ -62,7 +72,11 @@ export default class RemoteServer{
 		
 	}
 	public execCmd(cmd:string,args:string[]){
-		this.socket.write(cmd+" "+args.join(' '))
+		this.socket.write(JSON.stringify({
+			Type:"Cmd",
+			cmd:cmd,
+			args:args
+		}))
 	}
 
 
